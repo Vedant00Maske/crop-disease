@@ -3,6 +3,7 @@ import tensorflow as tf
 import numpy as np
 import time
 from PIL import Image
+from googletrans import Translator, LANGUAGES
 from gemini_service import get_treatment  # Import Gemini API function
 
 # Sidebar with new color
@@ -17,6 +18,21 @@ st.sidebar.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+# Initialize Translator
+translator = Translator()
+
+# Language Selection
+languages = {"English": "en", "Hindi": "hi", "Telugu": "te"}
+selected_lang = st.sidebar.selectbox("Choose Language", list(languages.keys()))
+
+def translate_text(text):
+    try:
+        translated = translator.translate(text, dest=languages[selected_lang])
+        return translated.text
+    except Exception as e:
+        return f"Translation error: {str(e)}"
+
 # Custom CSS for the entire app
 st.markdown(
     """
@@ -84,54 +100,32 @@ class_names = ['Apple___Apple_scab', 'Apple___Black_rot', 'Apple___Cedar_apple_r
 # Main Page
 if app_mode == "🏠 HOME":
     st.markdown("<h1 style='text-align: center; color: green;'>🌿 SMART DISEASE DETECTION</h1>", unsafe_allow_html=True)
-    st.write("Welcome to BioSage! Select **Disease Recognition** from the sidebar to detect plant diseases.")
+    st.write(translate_text("Welcome to BioSage! Select **Disease Recognition** from the sidebar to detect plant diseases."))
 
 # Prediction Page
 elif app_mode == "🔬 DISEASE RECOGNITION":
     st.markdown("<h2 style='text-align: center; color: darkgreen;'>🦠 DISEASE RECOGNITION</h2>", unsafe_allow_html=True)
     
-    test_image = st.file_uploader("📸 **Upload an Image of the Affected Plant:**", type=["jpg", "png", "jpeg"])
+    test_image = st.file_uploader("📸 " + translate_text("Upload an Image of the Affected Plant:"), type=["jpg", "png", "jpeg"])
     
-    # Display image preview automatically when uploaded in a contained box
     if test_image:
-        col1, col2, col3 = st.columns([1,2,1])
-        with col2:
-            st.markdown("""
-                <style>
-                .contained-image {
-                    width: 300px;
-                    height: 300px;
-                    margin: auto;
-                    padding: 10px;
-                    border: 2px solid #A27B5C;
-                    border-radius: 10px;
-                    object-fit: cover;
-                }
-                </style>
-            """, unsafe_allow_html=True)
-            st.image(
-                test_image, 
-                width=300,  # Smaller fixed width
-                caption="Uploaded Plant Image",
-                clamp=True,
-                output_format="PNG"
-            )
-    if test_image and st.button("🔍 Predict Disease"):
+        st.image(test_image, width=300, caption=translate_text("Uploaded Plant Image"))
+    
+    if test_image and st.button(translate_text("🔍 Predict Disease")):
         st.snow()
-        st.write("🔬 **Analyzing...** Please wait...")
+        st.write(translate_text("🔬 **Analyzing...** Please wait..."))
         result_index = model_prediction(test_image)
         predicted_disease = class_names[result_index]
         
         st.session_state['predicted_disease'] = predicted_disease
-        st.success(f"🌱 **Identified Disease:** **{predicted_disease}**")
+        st.success("🌱 " + translate_text(f"**Identified Disease:** {predicted_disease}"))
 
     if 'predicted_disease' in st.session_state:
         predicted_disease = st.session_state['predicted_disease']
         
-        # Treatment button with loading animation
-        if st.button("💊 Get Treatment Solution", key="treatment_btn"):
-            with st.spinner("🧑‍⚕️ Fetching AI-powered treatment recommendations..."):
-                time.sleep(2)  # Simulate loading delay
+        if st.button(translate_text("💊 Get Treatment Solution"), key="treatment_btn"):
+            with st.spinner(translate_text("🧑‍⚕️ Fetching AI-powered treatment recommendations...")):
+                time.sleep(2)
                 treatment = get_treatment(predicted_disease)
                 st.session_state['treatment'] = treatment
 
@@ -139,7 +133,9 @@ elif app_mode == "🔬 DISEASE RECOGNITION":
             treatment = st.session_state['treatment']
             st.markdown(f"""
         <div style="background-color: #2C3930; padding: 15px; border-radius: 10px; margin-top: 10px; border: 1px solid #A27B5C;">
-            <h3 style="color: #A27B5C;">Recommended Treatment for {predicted_disease}:</h3>
-            <p style="color: white;">{treatment}</p>
+            <h3 style="color: #A27B5C;">{translate_text("Recommended Treatment for")}: {predicted_disease}</h3>
+            <p style="color: white;">{translate_text(treatment)}</p>
         </div>
         """, unsafe_allow_html=True)
+        else:
+            st.warning(translate_text("🔍 Click the button above to get treatment recommendations."))
