@@ -8,3 +8,4 @@ scikit-learn==1.6.1
 tensorflow==2.18.0
 keras==3.8.0
 opencv-python-headless==4.11.0.86
+google-generativeai==0.8.4
