@@ -63,7 +63,7 @@ app_mode = st.sidebar.selectbox("Select Page", ["🏠 HOME", "🔬 DISEASE RECOG
 
 # Display header image
 img = Image.open("Diseases.png")
-st.image(img, use_container_width=True)
+st.image(img)
 
 # Disease labels
 class_names = ['Apple___Apple_scab', 'Apple___Black_rot', 'Apple___Cedar_apple_rust', 'Apple___healthy',
