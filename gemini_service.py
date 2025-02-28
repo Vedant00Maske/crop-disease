@@ -1,5 +1,5 @@
 import google.generativeai as genai
-import os
+
 
 
 # Configure Gemini API
