@@ -1,6 +1,6 @@
 import google.generativeai as genai
 import os
-from dotenv import load_dotenv
+
 
 # Configure Gemini API
 genai.configure(api_key="AIzaSyAKL2JLf5USXrGvIz6QTA72soKdIuFg4y0")
